@@ -137,7 +137,7 @@ enum AMDGPU_DEBUG_MASK {
 };
 
 unsigned int amdgpu_vram_limit = UINT_MAX;
-int amdgpu_ignore_min_pcap = 0; /* do not ignore by default */
+int amdgpu_ignore_min_pcap = 1; /* do not ignore by default */
 int amdgpu_vis_vram_limit;
 int amdgpu_gart_size = -1; /* auto */
 int amdgpu_gtt_size = -1; /* auto */
