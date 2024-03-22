@@ -49,6 +49,8 @@ enum oxp_board {
 	oxp_2,
 	oxp_fly,
 	orange_pi_neo,
+	oxp_2,
+	oxp_fly,
 	oxp_mini_amd,
 	oxp_mini_amd_a07,
 	oxp_mini_amd_pro,
@@ -71,14 +73,13 @@ static enum oxp_board board;
  * Different boards have different values and EC registers
  * for the same function
  */
-#define OXP_TURBO_SWITCH_REG		0xF1
-#define OXP_TURBO_TAKE_VAL		0x40
-#define OXP_TURBO_RETURN_VAL		0x00 /* Common return val */
+#define OXP_TURBO_SWITCH_REG            0xF1
+#define OXP_TURBO_TAKE_VAL              0x40
+#define OXP_TURBO_RETURN_VAL            0x00 /* Common return val */
 
-#define OXP_2_TURBO_SWITCH_REG		0xEB /* OXP2 and OXP2 Pro */
-#define OXP_MINI_TURBO_SWITCH_REG	0x1E /* Mini AO7 */
-#define OXP_MINI_TURBO_TAKE_VAL		0x01
-
+#define OXP_2_TURBO_SWITCH_REG          0xEB /* OXP2 and OXP2 Pro */
+#define OXP_MINI_TURBO_SWITCH_REG       0x1E /* Mini AO7 */
+#define OXP_MINI_TURBO_TAKE_VAL         0x01
 
 static const struct dmi_system_id dmi_table[] = {
 	{
@@ -283,6 +284,22 @@ static int tt_toggle_disable(void)
 }
 
 /* Callbacks for turbo toggle attribute */
+static umode_t tt_toggle_is_visible(struct kobject *kobj,
+				    struct attribute *attr, int n)
+{
+	switch (board) {
+	case aok_zoe_a1:
+	case oxp_2:
+	case oxp_fly:
+	case oxp_mini_amd_a07:
+	case oxp_mini_amd_pro:
+		return attr->mode;
+	default:
+		break;
+	}
+	return 0;
+}
+
 static ssize_t tt_toggle_store(struct device *dev,
 			       struct device_attribute *attr, const char *buf,
 			       size_t count)
@@ -350,6 +367,8 @@ static int oxp_pwm_enable(void)
 	case aya_neo_geek:
 	case oxp_mini_amd:
 	case oxp_mini_amd_a07:
+	case oxp_2:
+	case oxp_fly:
 	case oxp_mini_amd_pro:
 		return write_to_ec(OXP_SENSOR_PWM_ENABLE_REG, PWM_MODE_MANUAL);
 	default:
@@ -371,6 +390,8 @@ static int oxp_pwm_disable(void)
 	case aya_neo_geek:
 	case oxp_mini_amd:
 	case oxp_mini_amd_a07:
+	case oxp_2:
+	case oxp_fly:
 	case oxp_mini_amd_pro:
 		return write_to_ec(OXP_SENSOR_PWM_ENABLE_REG, PWM_MODE_AUTO);
 	default:
@@ -412,6 +433,8 @@ static int oxp_platform_read(struct device *dev, enum hwmon_sensor_types type,
 			case aya_neo_geek:
 			case oxp_mini_amd:
 			case oxp_mini_amd_a07:
+			case oxp_2:
+			case oxp_fly:
 			case oxp_mini_amd_pro:
 				return read_from_ec(OXP_SENSOR_FAN_REG, 2, val);
 			default:
@@ -466,6 +489,8 @@ static int oxp_platform_read(struct device *dev, enum hwmon_sensor_types type,
 			case aya_neo_geek:
 			case oxp_mini_amd:
 			case oxp_mini_amd_a07:
+			case oxp_2:
+			case oxp_fly:
 			case oxp_mini_amd_pro:
 				return read_from_ec(OXP_SENSOR_PWM_ENABLE_REG, 1, val);
 			default:
