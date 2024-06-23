@@ -7544,7 +7544,14 @@ static void alc269_fixup_match_via_dmi(struct hda_codec *codec,
 {
         int alc269_fix_id;
 
-        if(dmi_name_in_vendors("AYANEO"))
+	if(dmi_match(DMI_SYS_VENDOR, "AYANEO") && (
+		dmi_match(DMI_PRODUCT_NAME, "AIR 1S") ||
+		dmi_match(DMI_PRODUCT_NAME, "AIR 1S Limited") ||
+		dmi_match(DMI_PRODUCT_NAME, "FLIP DS") ||
+		dmi_match(DMI_PRODUCT_NAME, "FLIP KB") ||
+		dmi_match(DMI_PRODUCT_NAME, "KUN") ||
+		dmi_match(DMI_PRODUCT_NAME, "AIR Plus")
+		))
 			alc269_fix_id = ALC269_FIXUP_AYA_HEADSET_VOLUME;
 	else if (dmi_name_in_vendors("ayn"))
 			alc269_fix_id = ALC269VB_FIXUP_AYN_SPKR_PIN_FIX;
