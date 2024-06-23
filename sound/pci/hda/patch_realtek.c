@@ -7544,8 +7544,20 @@ static void alc269_fixup_match_via_dmi(struct hda_codec *codec,
 {
         int alc269_fix_id;
 
-        if(dmi_name_in_vendors("AYANEO"))
+	if(dmi_match(DMI_SYS_VENDOR, "AYANEO"))
+	{
+		if (
+			dmi_match(DMI_PRODUCT_NAME, "AIR 1S") ||
+			dmi_match(DMI_PRODUCT_NAME, "AIR 1S Limited") ||
+			dmi_match(DMI_PRODUCT_NAME, "FLIP DS") ||
+			dmi_match(DMI_PRODUCT_NAME, "FLIP KB") ||
+			dmi_match(DMI_PRODUCT_NAME, "KUN") ||
+			dmi_match(DMI_PRODUCT_NAME, "AIR Plus")
+		)
+			alc269_fix_id = ALC269VB_FIXUP_AYN_SPKR_PIN_FIX;
+		else
 			alc269_fix_id = ALC269_FIXUP_AYA_HEADSET_VOLUME;
+	}
 	else if (dmi_name_in_vendors("ayn"))
 			alc269_fix_id = ALC269VB_FIXUP_AYN_SPKR_PIN_FIX;
 	else
@@ -10635,7 +10647,7 @@ static const struct snd_pci_quirk alc269_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x2782, 0x0232, "CHUWI CoreBook XPro", ALC269VB_FIXUP_CHUWI_COREBOOK_XPRO),
 	SND_PCI_QUIRK(0x2782, 0x1707, "Vaio VJFE-ADL", ALC298_FIXUP_SPK_VOLUME),
 	SND_PCI_QUIRK(0x1f66, 0x0101, "Multiple Vendors", ALC269_FIXUP_DMI_MATCH),
-	SND_PCI_QUIRK(0x1f66, 0x0103, "AIR Plus", ALC269VB_FIXUP_AYN_SPKR_PIN_FIX),
+	SND_PCI_QUIRK(0x1f66, 0x0103, "Multiple Vendors", ALC269_FIXUP_DMI_MATCH),
 	SND_PCI_QUIRK(0x8086, 0x2074, "Intel NUC 8", ALC233_FIXUP_INTEL_NUC8_DMIC),
 	SND_PCI_QUIRK(0x8086, 0x2080, "Intel NUC 8 Rugged", ALC256_FIXUP_INTEL_NUC8_RUGGED),
 	SND_PCI_QUIRK(0x8086, 0x2081, "Intel NUC 10", ALC256_FIXUP_INTEL_NUC10),
