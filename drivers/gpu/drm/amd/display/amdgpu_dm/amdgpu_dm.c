@@ -81,6 +81,7 @@
 #include <linux/firmware.h>
 #include <linux/component.h>
 #include <linux/sort.h>
+#include <linux/dmi.h>
 
 #include <drm/display/drm_dp_mst_helper.h>
 #include <drm/display/drm_hdmi_helper.h>
