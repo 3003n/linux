@@ -406,6 +406,23 @@ static int ally_input_configured(struct hid_device *hdev, struct hid_input *hi)
 	return 0;
 }
 
+static void ally_disable_nkey_wakeup(struct hid_device *hdev)
+{
+	struct usb_interface *intf = to_usb_interface(hdev->dev.parent);
+	struct usb_device *udev;
+
+	if (!intf)
+		return;
+
+	udev = interface_to_usbdev(intf);
+	if (!udev)
+		return;
+
+	/* HACK: Mark Ally N-Key as incapable of wakeup */
+	device_set_wakeup_enable(&udev->dev, false);
+	hid_info(hdev, "Disabled wakeup capability on %s\n", dev_name(&udev->dev));
+}
+
 static int ally_hid_probe(struct hid_device *hdev, const struct hid_device_id *_id)
 {
 	int ret, ep;
@@ -458,6 +475,7 @@ static int ally_hid_probe(struct hid_device *hdev, const struct hid_device_id *_
 		goto err_close;
 
 	if (ep == HID_ALLY_INTF_CFG_IN) {
+		ally_disable_nkey_wakeup(hdev);
 		ret = ally_config_create(hdev, &ally_drvdata);
 		if (ret < 0)
 			hid_err(hdev, "Failed to create Ally configuration interface.\n");
