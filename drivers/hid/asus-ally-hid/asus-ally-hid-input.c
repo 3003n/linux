@@ -142,7 +142,7 @@ bool ally_x_raw_event(struct ally_x_input *ally_x, struct hid_report *report, u8
 		if (ally_x->qam_mode) {
 			spin_lock_irqsave(&ally_x->lock, flags);
 			/* Right Armoury Crate button */
-			if (data[1] == 0x38 && !ally_x->update_qam_chord) {
+			if ((data[1] == 0x38 || data[1] == 0x93) && !ally_x->update_qam_chord) {
 				ally_x->update_qam_chord = true;
 				if (ally_x->output_worker_initialized)
 					schedule_work(&ally_x->output_worker);
@@ -152,7 +152,7 @@ bool ally_x_raw_event(struct ally_x_input *ally_x, struct hid_report *report, u8
 			input_report_key(ally_x->input, BTN_MODE, data[1] == 0xA6);
 		} else {
 			/* Right Armoury Crate button */
-			input_report_key(ally_x->input, KEY_PROG1, data[1] == 0x38);
+			input_report_key(ally_x->input, KEY_PROG1, data[1] == 0x38 || data[1] == 0x93);
 			/* Left/XBox button */
 			input_report_key(ally_x->input, KEY_F16, data[1] == 0xA6);
 		}
@@ -162,7 +162,7 @@ bool ally_x_raw_event(struct ally_x_input *ally_x, struct hid_report *report, u8
 		input_report_key(ally_x->input, KEY_F18, data[1] == 0xA8);
 		input_sync(ally_x->input);
 
-		return data[1] == 0xA6 || data[1] == 0xA7 || data[1] == 0xA8 || data[1] == 0x38;
+		return data[1] == 0xA6 || data[1] == 0xA7 || data[1] == 0xA8 || data[1] == 0x38 || data[1] == 0x93;
 	}
 
 	return false;
