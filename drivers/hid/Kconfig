@@ -419,6 +419,15 @@ config HID_GLORIOUS
 	  Support for Glorious PC Gaming Race mice such as
 	  the Glorious Model O, O- and D.
 
+config HID_GPD
+	tristate "GPD handheld OEM HID fix"
+	depends on USB_HID
+	help
+	  Fix report descriptor for GPD USB HID 2f24:0137 ("Vendor for Windows"):
+	  it declares 63-byte Input and Feature reports but only transfers 11 data
+	  bytes per report, which newer kernels reject. Say Y or M if you use this
+	  device.
+
 config HID_HOLTEK
 	tristate "Holtek HID devices"
 	depends on USB_HID
