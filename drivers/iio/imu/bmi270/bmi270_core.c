@@ -1384,10 +1384,18 @@ static int bmi270_trigger_probe(struct bmi270_data *data,
 		irq_pin = BMI270_IRQ_INT1;
 	} else {
 		irq = fwnode_irq_get_byname(fwnode, "INT2");
-		if (irq < 0)
-			return 0;
+		if (irq > 0) {
+			irq_pin = BMI270_IRQ_INT2;
+		} else {
+			/* Fall back to first unnamed IRQ (common on ACPI
+			 * platforms where GpioInt has no name). Default
+			 * to INT1 pin since most ACPI tables wire it. */
+			irq = fwnode_irq_get(fwnode, 0);
+			if (irq < 0)
+				return 0;
 
-		irq_pin = BMI270_IRQ_INT2;
+			irq_pin = BMI270_IRQ_INT1;
+		}
 	}
 
 	irq_type = irq_get_trigger_type(irq);
