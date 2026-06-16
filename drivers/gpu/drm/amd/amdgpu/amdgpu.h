@@ -1103,6 +1103,7 @@ struct amdgpu_device {
 
 	int asic_reset_res;
 	struct work_struct		xgmi_reset_work;
+	struct work_struct		userq_reset_work;
 	struct work_struct		gpu_reset_event_work;
 	struct list_head		reset_list;
 
