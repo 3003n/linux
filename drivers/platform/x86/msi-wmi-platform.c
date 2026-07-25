@@ -79,8 +79,9 @@
 #define MSI_PLATFORM_SHIFT_USER		(MSI_PLATFORM_SHIFT_ENABLE + 3)
 
 /* Get_Data() and Set_Data() Params */
-#define MSI_PLATFORM_PL1_ADDR	0x50
-#define MSI_PLATFORM_PL2_ADDR	0x51
+#define MSI_PLATFORM_PPT_PL1_SPL_ADDR	0x50
+#define MSI_PLATFORM_PPT_PL2_SPPT_ADDR	0x51
+#define MSI_PLATFORM_PPT_PL3_FPPT_ADDR	0x52
 #define MSI_PLATFORM_BAT_ADDR	0xd7
 
 static bool force;
@@ -124,9 +125,10 @@ struct msi_wmi_platform_quirk {
 	bool charge_threshold;	/* Charge threshold is supported */
 	bool dual_fans;		/* For devices with two hwmon fans */
 	bool restore_curves;	/* Restore factory curves on unload */
-	int pl_min;		/* Minimum PLx value */
-	int pl1_max;		/* Maximum PL1 value */
-	int pl2_max;		/* Maximum PL2 value */
+	int ppt_min;		/* Minimum PLx value */
+	int ppt_pl1_spl_max;	/* Maximum PL1/SPL value */
+	int ppt_pl2_sppt_max;	/* Maximum PL2/SPPT value */
+	int ppt_pl3_fppt;		/* Maximum FPPT value */
 };
 
 struct msi_wmi_platform_factory_curves {
@@ -150,16 +152,19 @@ struct msi_wmi_platform_data {
 enum msi_fw_attr_id {
 	MSI_ATTR_PPT_PL1_SPL,
 	MSI_ATTR_PPT_PL2_SPPT,
+	MSI_ATTR_PPT_PL3_FPPT,
 };
 
 static const char *const msi_fw_attr_name[] = {
 	[MSI_ATTR_PPT_PL1_SPL] = "ppt_pl1_spl",
 	[MSI_ATTR_PPT_PL2_SPPT] = "ppt_pl2_sppt",
+	[MSI_ATTR_PPT_PL3_FPPT] = "ppt_pl3_fppt",
 };
 
 static const char *const msi_fw_attr_desc[] = {
 	[MSI_ATTR_PPT_PL1_SPL] = "CPU Steady package limit (PL1/SPL)",
 	[MSI_ATTR_PPT_PL2_SPPT] = "CPU Boost slow package limit (PL2/SPPT)",
+	[MSI_ATTR_PPT_PL3_FPPT] = "CPU Boost fast package limit (FPPT)",
 };
 
 #define MSI_ATTR_LANGUAGE_CODE "en_US.UTF-8"
@@ -229,18 +234,28 @@ static struct msi_wmi_platform_quirk quirk_gen1 = {
 	.charge_threshold = true,
 	.dual_fans = true,
 	.restore_curves = true,
-	.pl_min = 8,
-	.pl1_max = 43,
-	.pl2_max = 45
+	.ppt_min = 8,
+	.ppt_pl1_spl_max = 43,
+	.ppt_pl2_sppt_max = 45
 };
 static struct msi_wmi_platform_quirk quirk_gen2 = {
 	.shift_mode = true,
 	.charge_threshold = true,
 	.dual_fans = true,
 	.restore_curves = true,
-	.pl_min = 8,
-	.pl1_max = 30,
-	.pl2_max = 37
+	.ppt_min = 8,
+	.ppt_pl1_spl_max = 30,
+	.ppt_pl2_sppt_max = 37,
+};
+static struct msi_wmi_platform_quirk quirk_amd = {
+	.shift_mode = true,
+	.charge_threshold = true,
+	.dual_fans = true,
+	.restore_curves = true,
+	.ppt_min = 4,
+	.ppt_pl1_spl_max = 37,
+	.ppt_pl2_sppt_max = 45,
+	.ppt_pl3_fppt = 55
 };
 
 static const struct dmi_system_id msi_quirks[] = {
@@ -268,6 +283,15 @@ static const struct dmi_system_id msi_quirks[] = {
 		},
 		.driver_data = &quirk_gen2,
 	},
+	{
+		.ident = "MSI Claw A8",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "Micro-Star International Co., Ltd."),
+			DMI_MATCH(DMI_BOARD_NAME, "MS-1T8K"),
+		},
+		.driver_data = &quirk_amd,
+	},
+	{ }
 };
 
 static int msi_wmi_platform_parse_buffer(union acpi_object *obj, u8 *output, size_t length)
@@ -675,12 +699,12 @@ static int msi_wmi_platform_write(struct device *dev, enum hwmon_sensor_types ty
 	u8 buffer[32] = { };
 	int ret;
 
+	guard(mutex)(&data->wmi_lock);
+
 	switch (type) {
 	case hwmon_pwm:
 		switch (attr) {
 		case hwmon_pwm_enable:
-			guard(mutex)(&data->wmi_lock);
-
 			buffer[0] = MSI_PLATFORM_AP_SUBFEATURE_FAN_MODE;
 			ret = msi_wmi_platform_query_unlocked(
 				data, MSI_PLATFORM_GET_AP, buffer,
@@ -855,9 +879,11 @@ static int data_get_addr(struct msi_wmi_platform_data *data,
 {
 	switch (id) {
 	case MSI_ATTR_PPT_PL1_SPL:
-		return MSI_PLATFORM_PL1_ADDR;
+		return MSI_PLATFORM_PPT_PL1_SPL_ADDR;
 	case MSI_ATTR_PPT_PL2_SPPT:
-		return MSI_PLATFORM_PL2_ADDR;
+		return MSI_PLATFORM_PPT_PL2_SPPT_ADDR;
+	case MSI_ATTR_PPT_PL3_FPPT:
+		return MSI_PLATFORM_PPT_PL3_FPPT_ADDR;
 	default:
 		pr_warn("Invalid attribute id %d\n", id);
 		return -EINVAL;
@@ -1128,20 +1154,29 @@ static int msi_wmi_fw_attrs_init(struct msi_wmi_platform_data *data)
 	if (err)
 		return err;
 
-	if (data->quirks->pl1_max) {
+	if (data->quirks->ppt_pl1_spl_max) {
 		err = msi_fw_attr_init(data, MSI_ATTR_PPT_PL1_SPL,
-					&fw_attr_type_int, data->quirks->pl_min,
-					data->quirks->pl1_max, &data_get_value,
-					&data_set_value);
+					&fw_attr_type_int, data->quirks->ppt_min,
+					data->quirks->ppt_pl1_spl_max,
+					&data_get_value, &data_set_value);
 		if (err)
 			return err;
 	}
 
-	if (data->quirks->pl2_max) {
+	if (data->quirks->ppt_pl2_sppt_max) {
 		err = msi_fw_attr_init(data, MSI_ATTR_PPT_PL2_SPPT,
-				       &fw_attr_type_int, data->quirks->pl_min,
-				       data->quirks->pl2_max, &data_get_value,
-				       &data_set_value);
+				       &fw_attr_type_int, data->quirks->ppt_min,
+				       data->quirks->ppt_pl2_sppt_max,
+				       &data_get_value, &data_set_value);
+		if (err)
+			return err;
+	}
+
+	if (data->quirks->ppt_pl3_fppt) {
+		err = msi_fw_attr_init(data, MSI_ATTR_PPT_PL3_FPPT,
+				       &fw_attr_type_int, data->quirks->ppt_min,
+				       data->quirks->ppt_pl3_fppt,
+				       &data_get_value, &data_set_value);
 		if (err)
 			return err;
 	}
@@ -1422,16 +1457,12 @@ static int msi_wmi_platform_init(struct msi_wmi_platform_data *data)
 
 static int msi_wmi_platform_profile_setup(struct msi_wmi_platform_data *data)
 {
-	int err;
-
 	if (!data->quirks->shift_mode)
 		return 0;
 
 	data->ppdev = devm_platform_profile_register(
 		&data->wdev->dev, "msi-wmi-platform", data,
 		&msi_wmi_platform_profile_ops);
-	if (err)
-		return err;
 
 	return PTR_ERR_OR_ZERO(data->ppdev);
 }
