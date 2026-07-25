@@ -257,6 +257,16 @@ static struct msi_wmi_platform_quirk quirk_amd = {
 	.ppt_pl2_sppt_max = 45,
 	.ppt_pl3_fppt = 55
 };
+/* MSI Claw 8 EX AI+ (MS-1T91) */
+static struct msi_wmi_platform_quirk quirk_gen3 = {
+	.shift_mode = true,
+	.charge_threshold = true,
+	.dual_fans = true,
+	.restore_curves = true,
+	.ppt_min = 5,
+	.ppt_pl1_spl_max = 35,
+	.ppt_pl2_sppt_max = 45,
+};
 
 static const struct dmi_system_id msi_quirks[] = {
 	{
@@ -290,6 +300,14 @@ static const struct dmi_system_id msi_quirks[] = {
 			DMI_MATCH(DMI_BOARD_NAME, "MS-1T8K"),
 		},
 		.driver_data = &quirk_amd,
+	},
+	{
+		.ident = "MSI Claw 8 EX AI+",
+		.matches = {
+			DMI_MATCH(DMI_SYS_VENDOR, "Micro-Star International Co., Ltd."),
+			DMI_MATCH(DMI_BOARD_NAME, "MS-1T91"),
+		},
+		.driver_data = &quirk_gen3,
 	},
 	{ }
 };
@@ -795,6 +813,8 @@ static int msi_wmi_platform_profile_probe(void *drvdata, unsigned long *choices)
 	set_bit(PLATFORM_PROFILE_BALANCED, choices);
 	set_bit(PLATFORM_PROFILE_BALANCED_PERFORMANCE, choices);
 	set_bit(PLATFORM_PROFILE_PERFORMANCE, choices);
+	/* USER/shift mode; required so userspace can select "custom" for FA TDP */
+	set_bit(PLATFORM_PROFILE_CUSTOM, choices);
 	return 0;
 }
 
