@@ -234,7 +234,7 @@ static struct msi_wmi_platform_quirk quirk_gen1 = {
 	.charge_threshold = true,
 	.dual_fans = true,
 	.restore_curves = true,
-	.ppt_min = 8,
+	.ppt_min = 5,
 	.ppt_pl1_spl_max = 43,
 	.ppt_pl2_sppt_max = 45
 };
@@ -243,7 +243,7 @@ static struct msi_wmi_platform_quirk quirk_gen2 = {
 	.charge_threshold = true,
 	.dual_fans = true,
 	.restore_curves = true,
-	.ppt_min = 8,
+	.ppt_min = 5,
 	.ppt_pl1_spl_max = 30,
 	.ppt_pl2_sppt_max = 37,
 };
