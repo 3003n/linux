@@ -183,16 +183,12 @@ static const struct dmi_system_id orientation_data[] = {
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AOKZOE"),
 		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "AOKZOE A1 Pro"),
-		 DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AOKZOE"),
-		 DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "AOKZOE A1 Pro"),
 		},
 		.driver_data = (void *)&lcd1200x1920_leftside_up,
 	}, {	/* AOKZOE A2 Pro */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AOKZOE"),
 		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "AOKZOE A2 Pro"),
-		 DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AOKZOE"),
-		 DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "AOKZOE A2 Pro"),
 		},
 		.driver_data = (void *)&lcd1200x1920_leftside_up,
 	}, {	/* Asus T100HA */
@@ -219,40 +215,24 @@ static const struct dmi_system_id orientation_data[] = {
 		  DMI_MATCH(DMI_PRODUCT_NAME, "AYANEO 2"),
 		},
 		.driver_data = (void *)&lcd1200x1920_rightside_up,
-	}, {	/* AYA NEO AYANEO 2S */
-		.matches = {
-		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AYANEO"),
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "AYANEO 2S"),
-		},
-		.driver_data = (void *)&lcd1200x1920_rightside_up,
 	}, {	/* AYANEO 3 */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AYANEO"),
 		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "AYANEO 3"),
 		},
 		.driver_data = (void *)&lcd1080x1920_rightside_up,
-	}, {	/* AYA NEO FLIP DS */
-		.matches = {
-			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AYANEO"),
-			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "FLIP DS"),
-		},
-		.driver_data = (void *)&lcd1080x1920_leftside_up,
 	}, {	/* AYA NEO 2021 */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AYADEVICE"),
 		  DMI_MATCH(DMI_PRODUCT_NAME, "AYA NEO"),
 		},
 		.driver_data = (void *)&lcd800x1280_rightside_up,
-	}, {	/* AYA NEO 2021 */
+	}, {	/* AYA NEO 2021 series (alternate vendor id) */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AYANEO"),
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "NEO 2021"),
+		  DMI_MATCH(DMI_PRODUCT_NAME, "NEO 2021"),
 		},
 		.driver_data = (void *)&lcd800x1280_rightside_up,
-	}, {	/* AYA NEO 2021 series (alternate vendor id) */
-		  DMI_MATCH(DMI_PRODUCT_NAME, "NEO 2021"),
- 		},
- 		.driver_data = (void *)&lcd800x1280_rightside_up,
 	}, {	/* AYA NEO AIR */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "AYANEO"),
@@ -380,12 +360,6 @@ static const struct dmi_system_id orientation_data[] = {
 		  DMI_EXACT_MATCH(DMI_BOARD_NAME, "Default string"),
 		},
 		.driver_data = (void *)&gpd_pocket2,
-	}, {	/* GPD Pocket 4 */
-		.matches = {
-		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "GPD"),
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "G1628-04"),
-		},
-		.driver_data = (void *)&lcd1600x2560_rightside_up,
 	}, {	/* GPD Win (same note on DMI match as GPD Pocket) */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "AMI Corporation"),
@@ -597,7 +571,6 @@ static const struct dmi_system_id orientation_data[] = {
 		},
 		.driver_data = (void *)&lcd1600x2560_leftside_up,
 	}, {	/* OneXPlayer X1Pro EVA variant with Intel */
-	}, {	/* OneXPlayer X1Pro EVA variant */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "ONE-NETBOOK"),
 		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ONEXPLAYER X1Pro EVA-02"),
@@ -607,24 +580,6 @@ static const struct dmi_system_id orientation_data[] = {
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "ONE-NETBOOK"),
 		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ONEXPLAYER F1 EVA-01"),
-	}, {	/* OneXPlayer X1 Intel */
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ONEXPLAYER X1 i"),
-		},
-		.driver_data = (void *)&lcd1600x2560_leftside_up,
-	}, {	/* OneXPlayer X1 Intel */
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ONEXPLAYER X1Air"),
-		},
-		.driver_data = (void *)&lcd1600x2560_leftside_up,
-	}, {	/* OneXPlayer X1 mini (AMD) */
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ONEXPLAYER X1 mini"),
-		},
-		.driver_data = (void *)&lcd1600x2560_leftside_up,
-	}, {	/* OneXPlayer X1 mini pro (AMD Strix Point) */
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ONEXPLAYER X1Mini Pro"),
-		},
-		.driver_data = (void *)&lcd1600x2560_leftside_up,
-	}, {	/* OneXPlayer OneXFly F1 Pro (OLED) Strix Point */
-		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "ONEXPLAYER F1Pro"),
 		},
 		.driver_data = (void *)&lcd1080x1920_leftside_up,
 	}, {	/* OneXPlayer OneXFly F1 Pro (OLED) LE Red variant */
@@ -688,14 +643,12 @@ static const struct dmi_system_id orientation_data[] = {
 		},
 		.driver_data = (void *)&lcd1280x1920_rightside_up,
 	}, {    /* Tectoy Zeenix Lite */
-	}, {    /* Tectoy Zeenix Lite (AYN Loki Zero Rebadge) */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "Tectoy"),
 		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "Zeenix Lite"),
 		},
 		.driver_data = (void *)&lcd1080x1920_leftside_up,
 	}, {    /* Tectoy Zeenix Pro */
-	}, {    /* Tectoy Zeenix Pro (AYN Loki Max Rebadge) */
 		.matches = {
 		  DMI_EXACT_MATCH(DMI_SYS_VENDOR, "Tectoy"),
 		  DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "Zeenix Pro"),
